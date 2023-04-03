@@ -41,11 +41,11 @@ def banner():
 
 def autoSetup():
   print(Fore.GREEN)
-  os.system("bashScripts/managed.sh")
+  os.system("bashScripts/moniter.sh")
 
 def autoStop():
   print(Fore.GREEN)
-  os.system("bashScripts/moniter.sh") 
+  os.system("bashScripts/managed.sh") 
   
   
 def wifiPersonal():
