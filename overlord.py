@@ -1,6 +1,7 @@
 
 from colorama import Fore, Back, Style
 import re, subprocess, os
+import modules
 
 banner_Text = """
 888888888888  88                                                                               
@@ -28,8 +29,11 @@ version = "Version:1.0"
 author = "Author: @G37SYS73M"
 usages="""
 Usages:
-1: Auto Setup (Only works with rtl8812au)
-2: Audit Wifi personal
+1: Auto Setup
+2: Check Devices
+3: Sniff Wifi Networks
+4: Audit WPA Personal
+9: Auto Stop
 0: Exit
 """
 
@@ -39,29 +43,25 @@ def banner():
   print(Fore.YELLOW + Style.BRIGHT + version +"  "+ author)
   print(Fore.GREEN + Style.BRIGHT + usages + Style.RESET_ALL)
 
-def autoSetup():
-  print(Fore.GREEN)
-  os.system("bashScripts/moniter.sh")
-
-def autoStop():
-  print(Fore.GREEN)
-  os.system("bashScripts/managed.sh") 
-  
-  
-def wifiPersonal():
-  print("Personal WIFI")
-
 def options():
   while True:
-    cmd = input(Fore.RED + "OVERLORD# " + Style.RESET_ALL)
+    cmd = input(Fore.RED + Style.BRIGHT + "OVERLORD# " + Style.RESET_ALL)
     if cmd != '0':
       if cmd == '1':
-        autoSetup()
+        modules.autoSetup()
       elif cmd == '2':
-        wifiPersonal()
+        modules.checkDevice()
+      elif cmd == '3':
+        modules.sniffNetwork()
+      elif cmd == '4':
+        modules.testWPA_PSK()
       elif cmd == '9':
-        autoStop()
+        modules.autoStop()
       else:
         print(Fore.GREEN + Style.BRIGHT + usages + Style.RESET_ALL)
     else:
       exit()
+      
+if __name__ == "__main__":
+  banner()
+  options()

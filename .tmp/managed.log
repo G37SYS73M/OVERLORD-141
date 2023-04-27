@@ -1,0 +1,6 @@
+
+PHY	Interface	Driver		Chipset
+
+phy0	wlan0		88XXau		Realtek Semiconductor Corp. RTL8812AU 802.11a/b/g/n/ac 2T2R DB WLAN Adapter
+		(monitor mode disabled)
+
