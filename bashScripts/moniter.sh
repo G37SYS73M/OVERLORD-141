@@ -2,8 +2,8 @@
 
 sudo airmon-ng
 sudo airmon-ng check kill
-sudo ip link set wlan0 down
-sudo iw dev wlan0 set type monitor
-sudo ip link set wlan0 up
-sudo iw wlan0 set txpower fixed 3000
-sudo iw wlan0 info
+sudo ip link set $1 down
+sudo iw dev $1 set type monitor
+sudo ip link set $1 up
+sudo iw $1 set txpower fixed 3000
+sudo iw $1 info
