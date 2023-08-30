@@ -18,12 +18,17 @@ echo "
 
 "
 
+project_name=''
+read -p "Enter the Project's Name: " project_name
+mkdir projects/$project_name
+
 OPTIONS='
 OPTIONS:\n
 1 => Put Device in Monitor Mode \n
 2 => Put Device in Managed Mode \n
-3 => Scan For Networks \n
-4 => Scan A NetWork \n
+3 => Scan For Access Points (APs) \n
+4 => Scan A Access Point (AP) \n
+5 => Attacks
 '
 
 echo -e $OPTIONS
@@ -32,48 +37,60 @@ echo -e $OPTIONS
 keyword="exit"
 user_input=""
 
-read -p "Enter a keyword (type 'exit' to stop): " user_input
+read -p "Enter an option (type 'exit' to stop): " user_input
 
 while [ "$user_input" != "$keyword" ]
 do
     
 
     if [ $user_input -eq 1 ]; then  
-    	./scripts/deviceManagment.sh $interface_name 1
+    	echo `date +%d-%m-%y-%H_%M` >> projects/$project_name/command.logs
+    	./scripts/deviceManagment.sh $interface_name 1 | tee -a projects/$project_name/command.logs
 
 
     elif [ $user_input -eq 2 ]; then
-    	./scripts/deviceManagment.sh $interface_name 2
+    	echo `date +%d-%m-%y-%H_%M` >> projects/$project_name/command.logs
+    	./scripts/deviceManagment.sh $interface_name 2 | tee -a projects/$project_name/command.logs
 
 
     elif [ $user_input -eq 3 ]; then
-    	mins=''
-    	read -p "Enter time to sniff (Miniutes)(Default: 5mins): " mins
-    	if [ $mins -eq 0 ];then
-			./scripts/scanForNetworks.sh $interface_name 5
-		else
-			./scripts/scanForNetworks.sh $interface_name $mins
+    	mins=5
+    	user_input_mins=''
+    	read -p "Enter time to sniff (Miniutes)(Default: 5mins): " user_input_mins
+    	if [ -n "$user_input_mins" ]; then
+    		mins=$user_input_mins
 		fi
+    	cmd_time=`date +%d-%m-%y-%H_%M`
+    	echo $cmd_time >> tee -a projects/$project_name/command.logs 
+    	./scripts/scanForNetworks.sh $interface_name $mins | tee -a projects/$project_name/command.logs | tee projects/$project_name/scanForNetworks.txt
 
 
     elif [ $user_input -eq 4 ]; then
-    	project_mode='N'
-		read -p "Do you want to start in Project Mode (Y/N): " project_mode
-		if [ $project_mode == 'Y' ]; then
-    		echo 'In Development'
-		else
-    		mins=''
-    		bssid=''
-    		channel=''
-    		read -p "Enter BSSID: " bssid
-    		read -p "Enter Channel Number: " channel
-    		read -p "Enter time to sniff (Miniutes)(Default: 5mins): " mins
-    		if [ $mins -eq 0 ];then
-				./scripts/scanNetwork.sh $interface_name $bssid $channel 5
-			else
-				./scripts/scanNetwork.sh $interface_name $bssid $channel $mins
-			fi
+		mins=''
+    	bssid=''
+    	channel=''
+    	mins=5
+    	user_input_mins=''
+    	read -p "Enter BSSID: " bssid
+    	read -p "Enter Channel Number: " channel
+    	read -p "Enter time to scan AP (Miniutes)(Default: 5mins): " user_input_mins
+    	if [ -n "$user_input_mins" ]; then
+    		mins=$user_input_mins
 		fi
+    	cmd_time=`date +%d-%m-%y-%H_%M`
+    	echo $cmd_time >> tee -a projects/$project_name/command.logs
+		./scripts/scanNetwork.sh $interface_name $bssid $channel $mins | tee -a projects/$project_name/command.logs | tee projects/$project_name/scan-$bssid.txt
+		cat projects/$project_name/scan-$bssid.txt | awk 'NR==2 {ssid=$0; getline} END {printf "\"%s\",\"%s\"\n", ssid, $0}' >> projects/$project_name/ScannedAPs.csv
+
+
+    elif [ $user_input -eq 5 ]; then
+    	echo "[*] ScannedAPs:"
+    	cat projects/$project_name/ScannedAPs.csv
+    	essid=''
+    	read -p "Enter target AP's EISSID: " essid
+    	cmd_time=`date +%d-%m-%y-%H_%M`
+    	echo $cmd_time >> projects/$project_name/command.logs
+    	./scripts/wpaAttacks.sh $interface_name $essid | tee -a projects/$project_name/command.logs | tee projects/$project_name/Attack-$essid.txt
 
 
     else
@@ -81,7 +98,7 @@ do
     fi
 
     echo -e $OPTIONS
-    read -p "Enter a keyword (type 'exit' to stop): " user_input
+    read -p "Enter an options (type 'exit' to stop): " user_input
 
 done
 
