@@ -22,14 +22,15 @@ project_name=''
 read -p "Enter the Project's Name: " project_name
 mkdir projects/$project_name
 
-OPTIONS='
+OPTIONS='\n
 OPTIONS:\n
 1 => Put Device in Monitor Mode \n
 2 => Put Device in Managed Mode \n
 3 => Scan For Access Points (APs) \n
 4 => Scan An Access Point (AP) \n
-5 => Auto WPA Attacks Using Wifite \n
-6 => Auto WEP Attacks Using Wifite
+5 => Show Scanned Access Points (APs) \n
+9 => Auto WPA Attacks Using Wifite \n
+10 => Auto WEP Attacks Using Wifite \n
 '
 
 echo -e $OPTIONS
@@ -46,12 +47,15 @@ do
 	#Putting in moniter mode.
     if [ $user_input -eq 1 ]; then  
     	echo `date +%d-%m-%y-%H_%M` >> projects/$project_name/command.logs
-    	./scripts/deviceManagment.sh $interface_name 1 | tee projects/$project_name/command.logs
+    	./scripts/deviceManagment.sh $interface_name 1 | tee -a projects/$project_name/command.logs
 
     #putting in managed mode
     elif [ $user_input -eq 2 ]; then
     	echo `date +%d-%m-%y-%H_%M` >> projects/$project_name/command.logs
-    	./scripts/deviceManagment.sh $interface_name 2 | tee projects/$project_name/command.logs
+    	./scripts/deviceManagment.sh $interface_name 2 | tee -a projects/$project_name/command.logs
+
+
+
 
     #Scanning for all networks
     elif [ $user_input -eq 3 ]; then
@@ -62,8 +66,15 @@ do
     		mins=$user_input_mins
 		fi
     	cmd_time=`date +%d-%m-%y-%H_%M`
-    	echo $cmd_time >> tee projects/$project_name/command.logs 
-    	./scripts/scanForNetworks.sh $interface_name $mins | tee projects/$project_name/command.logs | tee projects/$project_name/scanForNetworks.txt
+    	echo "----------------------------------------------------------------------" >> projects/$project_name/command.logs 
+    	echo $cmd_time >> projects/$project_name/command.logs 
+    	echo /scripts/scanForNetworks.sh $interface_name $mins >> projects/$project_name/command.logs
+    	echo $cmd_time >> projects/$project_name/scanForNetworks.txt
+    	echo "Command Output" >> projects/$project_name/command.logs
+    	./scripts/scanForNetworks.sh $interface_name $mins | tee -a projects/$project_name/command.logs | tee -a projects/$project_name/scanForNetworks.txt
+
+
+
 
     #Scanning an AP
     elif [ $user_input -eq 4 ]; then
@@ -79,12 +90,27 @@ do
     		mins=$user_input_mins
 		fi
     	cmd_time=`date +%d-%m-%y-%H_%M`
-    	echo $cmd_time >> tee -a projects/$project_name/command.logs
-		./scripts/scanNetwork.sh $interface_name $bssid $channel $mins | tee projects/$project_name/command.logs | tee projects/$project_name/scan-$bssid.txt
-		cat projects/$project_name/scan-$bssid.txt | awk 'NR==2 {ssid=$0; getline} END {printf "\"%s\",\"%s\"\n", ssid, $0}' >> projects/$project_name/ScannedAPs.csv
+    	echo "----------------------------------------------------------------------" >> projects/$project_name/command.logs 
+    	echo $cmd_time >> projects/$project_name/command.logs
+    	echo /scripts/scanNetwork.sh $interface_name $bssid $channel $mins >> projects/$project_name/command.logs
+    	echo "Command Output" >> projects/$project_name/command.logs
+		./scripts/scanNetwork.sh $interface_name $bssid $channel $mins | tee -a projects/$project_name/command.logs | tee -a projects/$project_name/scan-$bssid.txt
+		cat projects/$project_name/scan-$bssid.txt | awk '/ESSID of the AP:/ {getline; essid=$0} /BSSID of the AP:/ {getline; bssid=$0} END {print "\"" essid "\",\"" bssid "\""}' >> projects/$project_name/ScannedAPs.csv
+
+
+    #Show scanned APs
+    elif [ $user_input -eq 5 ]; then
+		echo "[*] ScannedAPs:"
+    	cat projects/$project_name/ScannedAPs.csv
+
+
+
+
+
+
 
 	#Auto WPA attacks Using Wifite
-    elif [ $user_input -eq 5 ]; then
+    elif [ $user_input -eq 9 ]; then
     	echo "[*] ScannedAPs:"
     	cat projects/$project_name/ScannedAPs.csv
     	essid=''
@@ -94,8 +120,11 @@ do
     	./scripts/wpaAttacks.sh $interface_name $essid | tee projects/$project_name/command.logs | tee projects/$project_name/Attack-WPA-Wifite-$essid.txt
 
 
+
+
+
 	#Auto WEP attacks Using Wifite
-    elif [ $user_input -eq 5 ]; then
+    elif [ $user_input -eq 10 ]; then
     	echo "[*] ScannedAPs:"
     	cat projects/$project_name/ScannedAPs.csv
     	essid=''

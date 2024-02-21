@@ -15,6 +15,8 @@ then
 	xterm -e timeout $4m airodump-ng $1 --bssid $2 --channel $3 -w /tmp/$foldername/$filename
 	echo "[*] ESSID of the AP:"
 	cat /tmp/$foldername/$filename-01.csv | grep $2 | head -n 1 | awk -F',' '{print $14}'
+	echo "[*] BSSID of the AP:"
+	cat /tmp/$foldername/$filename-01.csv | grep $2 | head -n 1 | awk -F',' '{print $1}'
 	echo "[*] Encryption used by the AP:"
 	cat /tmp/$foldername/$filename-01.csv | grep $2 | head -n 1 | awk -F',' '{print $6}'
 	echo "[*] Cipher used by the AP:"
