@@ -17,6 +17,8 @@ then
 	cat /tmp/$foldername/$filename-01.csv | grep $2 | head -n 1 | awk -F',' '{print $14}'
 	echo "[*] BSSID of the AP:"
 	cat /tmp/$foldername/$filename-01.csv | grep $2 | head -n 1 | awk -F',' '{print $1}'
+	echo "[*] Channel Number of the AP:"
+	cat /tmp/$foldername/$filename-01.csv | grep $2 | head -n 1 | awk -F',' '{print $4}'
 	echo "[*] Encryption used by the AP:"
 	cat /tmp/$foldername/$filename-01.csv | grep $2 | head -n 1 | awk -F',' '{print $6}'
 	echo "[*] Cipher used by the AP:"
