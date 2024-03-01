@@ -14,7 +14,7 @@ then
 	sudo ip link set $1 up > /dev/null
 	sudo service NetworkManager restart > /dev/null
 	sudo iw $1 info > /dev/null
-	echo "\n\033[31m [*] " $1 " is now in Monitor Mode\033[0m"
+	echo "\n\033[32m [*] " $1 " is now in Monitor Mode\033[0m"
 fi
 
 if [ $2 -eq 2 ]
@@ -26,5 +26,5 @@ then
 	sudo ip link set $1 up > /dev/null
 	sudo iw $1 set txpower fixed 3000 > /dev/null
 	sudo iw $1 info > /dev/null
-	echo "\n\033[31m [*] " $1 " is now in Managed Mode\033[0m"
+	echo "\n\033[32m [*] " $1 " is now in Managed Mode\033[0m"
 fi
